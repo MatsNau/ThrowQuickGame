@@ -10,6 +10,7 @@
 
 #include <SDL.h>
 #include <string>
+#include <SDL_image.h>
 
 class Player {
 private:
@@ -24,8 +25,11 @@ private:
     bool m_isMovingRight;
 
 public:
-    Player(const std::string& playerName, SDL_Renderer* renderer);
+    Player();
     ~Player();
+
+    // Methode um die Position und die Größe des Spieler zu definieren
+    void initPlayer(const std::string playerName, SDL_Renderer* renderer, int* posx, int* posy);
 
     // Methode zur Bewegung des Spielers
     void move();
@@ -33,6 +37,12 @@ public:
 
     // Methode zum Zeichnen des Spielers auf dem Bildschirm
     void draw();
+
+    // Methode zur Bereitstellung der Textur
+    SDL_Texture* getTexture();
+
+    //Getter für die position
+    SDL_Rect* getPosition();
 
     // Getter und Setter für den Namen des Spielers
     std::string getName() const;

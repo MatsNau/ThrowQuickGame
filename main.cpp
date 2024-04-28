@@ -1,16 +1,41 @@
 #define SDL_MAIN_HANDLED // insert this
 #include <iostream>
 #include <SDL2/SDL.h>
+#include <memory>
 
 #include "RenderWindow.h"
 #include "Player.h"
+#include "Game.h"
 
 int main() {
 
     const int WINDOW_WIDTH = 800;
     const int WINDOW_HEIGHT = 600;
+    const int FPS = 60;
+    const int frameDelay = 1000 / FPS;
 
-    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER) != 0) {
+    Uint32 frameStart;
+    int frameTime;
+
+    std::unique_ptr<Game> game = std::make_unique<Game>();
+
+    game->init("QuickThrow", WINDOW_WIDTH, WINDOW_HEIGHT, false);
+    game->initPlayers();
+    while (game->running())
+    {
+        frameStart = SDL_GetTicks();
+
+        //game->handleEvents();
+        game->update();
+        game->render();
+
+        frameTime = SDL_GetTicks() - frameStart;
+
+        if(frameDelay > frameTime)
+            SDL_Delay(frameDelay - frameTime);
+    }
+
+   /* if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER) != 0) {
         std::cerr << "Fehler beim Initialisieren von SDL: " << SDL_GetError() << std::endl;
         return 1;
     }
@@ -35,16 +60,20 @@ int main() {
     RenderWindow window("Catch Throw", WINDOW_WIDTH, WINDOW_HEIGHT);
     //Erstelle einen Player
     Player player("Player1", window.GetRenderer());
-    Player player2("Player2", window.GetRenderer());
+    //Player player2("Player2", window.GetRenderer());
 
-    // Hauptschleife: Warte auf Benutzerinteraktion
+    // GameLoop
     bool isRunning = true;
+    Uint32 prevTime = SDL_GetTicks();
     while (isRunning) {
+        // Aktuelle Zeit erfassen und Delta-Zeit berechnen
+        Uint32 currentTime = SDL_GetTicks();
+        float deltaTime = (currentTime - prevTime) / 1000.0f; // in Sekunden umwandeln
         // Ereignisse verarbeiten
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
             player.handleInput(event);
-            player2.handleInput(event);
+            //player2.handleInput(event);
             if (event.type == SDL_QUIT) {
                 isRunning = false;
             }
@@ -52,14 +81,16 @@ int main() {
 
         // Inhalte zeichnen
         window.Clear();
-       //Draw the player
-       player.draw();
-       player2.draw();
-       //Move player
-       player.move();
-       player2.move();
+        //Draw the player
+        player.draw();
+        //player2.draw();
+
+        //Move player
+        player.move(deltaTime);
+        //player2.move(deltaTime);
+
         window.Present();
-    }
+    }*/
 
     return 0;
 }

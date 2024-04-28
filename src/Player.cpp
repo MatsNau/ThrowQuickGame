@@ -4,16 +4,23 @@
 #include "Player.h"
 #include <iostream>
 
-Player::Player(const std::string& playerName, SDL_Renderer* renderer)
-    : m_name(playerName)
+Player::Player()
+{}
+
+Player::~Player() {
+    SDL_DestroyTexture(m_sprite);
+}
+
+void Player::initPlayer(const std::string playerName, SDL_Renderer *renderer, int* posx, int* posy)
 {
-    m_velocity = 1.0f;
+    m_name = playerName;
+    m_velocity = 1.5f;
     m_renderer = renderer;
     // Initialisiere die Position des Spielers
     m_position.x = 100;
     m_position.y = 100;
-    m_position.w = 50;
-    m_position.h = 50;
+    m_position.w = 100;
+    m_position.h = 100;
 
     // Initialisierung der Bewegungsstatus
     m_isMovingUp = false;
@@ -22,7 +29,7 @@ Player::Player(const std::string& playerName, SDL_Renderer* renderer)
     m_isMovingRight = false;
 
     // Lade den Sprite des Spielers
-    SDL_Surface* surface = SDL_LoadBMP("megaman.bmp");
+    SDL_Surface* surface = SDL_LoadBMP("Head.bmp");
     if (!surface) {
         std::cerr << "Failed to load player sprite: " << SDL_GetError() << std::endl;
     }
@@ -30,29 +37,30 @@ Player::Player(const std::string& playerName, SDL_Renderer* renderer)
     SDL_FreeSurface(surface);
 }
 
-Player::~Player() {
-    SDL_DestroyTexture(m_sprite);
-}
 
 void Player::handleInput(SDL_Event& event)
 {
-    if (m_name == "Player1")
+    if (m_name == "PlayerOne")
     {
         // Tasten für Bewegung nach oben/unten
         if (event.key.keysym.sym == SDLK_w) {
             m_isMovingUp = event.type == SDL_KEYDOWN;
+            std::cout << "w" << std::endl;
         } else if (event.key.keysym.sym == SDLK_s) {
             m_isMovingDown = event.type == SDL_KEYDOWN;
+            std::cout << "s" << std::endl;
         }
 
         // Tasten für Bewegung nach links/rechts
         if (event.key.keysym.sym == SDLK_a) {
             m_isMovingLeft = event.type == SDL_KEYDOWN;
+            std::cout << "a" << std::endl;
         } else if (event.key.keysym.sym == SDLK_d) {
             m_isMovingRight = event.type == SDL_KEYDOWN;
+            std::cout << "d" << std::endl;
         }
     }
-    else if(m_name == "Player2") {
+    else if(m_name == "PlayerTwo") {
         if (event.type == SDL_JOYAXISMOTION) {
             // X-Achsenbewegung
             if (event.jaxis.axis == 0) {
@@ -90,6 +98,23 @@ void Player::handleInput(SDL_Event& event)
     }
 }
 
+/*void Player::handleInput(SDL_Event &event)
+{
+    // Tasten für Bewegung nach oben/unten
+    if (event.key.keysym.sym == SDLK_w) {
+        m_position.y -= m_velocity;
+    } else if (event.key.keysym.sym == SDLK_s) {
+        m_position.y += m_velocity;
+    }
+
+    // Tasten für Bewegung nach links/rechts
+    if (event.key.keysym.sym == SDLK_a) {
+        m_position.x -= m_velocity;
+    } else if (event.key.keysym.sym == SDLK_d) {
+        m_position.x += m_velocity;
+    }
+}*/
+
 void Player::move()
 {
     // Bewegung basierend auf den aktuellen Bewegungsstatus durchführen
@@ -109,6 +134,16 @@ void Player::move()
 
 void Player::draw() {
     SDL_RenderCopy(m_renderer, m_sprite, nullptr, &m_position);
+}
+
+SDL_Texture* Player::getTexture()
+{
+    return m_sprite;
+}
+
+SDL_Rect* Player::getPosition()
+{
+    return &m_position;
 }
 
 std::string Player::getName() const {
